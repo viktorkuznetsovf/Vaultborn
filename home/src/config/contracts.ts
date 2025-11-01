@@ -1,5 +1,5 @@
 // VaultbornStaking contract configuration
-export const CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000000';
+export const CONTRACT_ADDRESS = '0x21C0EF28949C07428A1FC6382705bBc7a08C8DD6';
 
 export const CONTRACT_ABI = [
   {
