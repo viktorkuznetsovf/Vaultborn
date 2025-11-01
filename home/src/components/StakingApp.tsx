@@ -1,5 +1,7 @@
-import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { ChangeEvent } from 'react';
 import { Contract, formatEther, parseEther } from 'ethers';
+import type { Interface, LogDescription } from 'ethers';
 import { useAccount, usePublicClient, useReadContract } from 'wagmi';
 
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../config/contracts';
@@ -24,6 +26,9 @@ type RedeemState = 'idle' | 'pending' | 'processing';
 type EventLog = {
   args?: Record<string, unknown>;
 };
+
+type InterfaceLogInput = Parameters<Interface['parseLog']>[0];
+type ParsedLogDescription = LogDescription;
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -309,14 +314,14 @@ export function StakingApp() {
 
         const receipt = await tx.wait();
         const parsedLog = receipt.logs
-          .map(log => {
+          .map((log: InterfaceLogInput): ParsedLogDescription | null => {
             try {
               return contract.interface.parseLog(log);
             } catch (error) {
               return null;
             }
           })
-          .find(parsed => parsed?.name === 'WithdrawRequested');
+          .find((parsed: ParsedLogDescription | null): parsed is ParsedLogDescription => parsed?.name === 'WithdrawRequested');
 
         const requestId = parsedLog?.args?.requestId?.toString();
         setPendingWithdrawals(prev => ({
